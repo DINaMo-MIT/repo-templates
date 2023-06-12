@@ -1,0 +1,49 @@
+# Pre-commit configuration. See https://pre-commit.com
+
+default_language_version:
+  python: python3
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=<% $GIT_MAX_FILE_KB %>']
+
+  - repo: https://gitlab.com/bmares/check-json5
+    rev: v1.0.0
+    hooks:
+      - id: check-json5
+
+
+  - repo: https://github.com/psf/black
+    rev: 22.12.0
+    hooks:
+      - id: black
+        args:
+          - --line-length=<% $LINE_LENGTH %>
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: ["--profile", "black", "--filter-files", "--line-length", "<% $LINE_LENGTH %>", "--skip-gitignore"]
+
+  # Use pyupgrade (https://github.com/asottile/pyupgrade) to automatically upgrade syntax for newer python
+  - repo: https://github.com/asottile/pyupgrade
+    rev: <% $ACT_VER_PYUPGRADE %>
+    hooks:
+      - id: pyupgrade
+
+  # To stop flake8 error from causing a failure, use --exit-zero. By default, pre-commit will not show the warnings,
+  # so use verbose: true to see them.
+  - repo: https://github.com/pycqa/flake8
+    rev: <% $ACT_VER_FLAKE8 %>
+    hooks:
+      - id: flake8
+        # Black compatibility
+        args: ["--max-line-length=<% $LINE_LENGTH %>", "--extend-ignore=E203", "--exit-zero"]
+        verbose: true
